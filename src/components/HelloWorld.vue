@@ -119,7 +119,7 @@ export default {
       })
 
       _this.saveDiagram(function (err, xml) {
-        console.log('最新xml数据为：',xml)
+        console.log('最新xml数据为：', xml)
         _this.setEncoded(downloadLink, 'diagram.bpmn', err ? null : xml)
       })
     })

@@ -1,5 +1,21 @@
 https://blog.csdn.net/peng_wei_kang/article/details/89532210
 
-1.修改node_modules/diagram-js/lib/i18n/translate/translate.js
+1.修改node_modules/diagram-js/lib/i18n/translate/translate.js 为：
+
+import zhCH from './zh-CH';
+
+export default function translate(template, replacements) {
+
+  replacements = replacements || zhCH;
+
+  if(replacements[template]){
+    return replacements[template];
+  }
+
+  return template.replace(/{([^}]+)}/g, function(_, key) {
+    return replacements[key] || '{' + key + '}';
+  });
+}
+
 
 2.添加zh-CH.js文件
