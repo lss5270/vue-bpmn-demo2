@@ -31,7 +31,8 @@ export default {
       container: null,
       canvas: null,
       xmlStr: null,
-      processName: ''
+      processName: '',
+      xmlJson: ''
     }
   },
   methods: {
@@ -81,6 +82,10 @@ export default {
         link.href = 'data:application/bpmn20-xml;charset=UTF-8,' + encodedData
         link.download = name
       }
+    },
+    // 获取json
+    getXmlJson () {
+      return this.xmlJson
     }
   },
   mounted () {
@@ -120,11 +125,15 @@ export default {
 
       _this.saveDiagram(function (err, xml) {
         console.log('最新xml数据为：', xml)
+        _this.xmlJson = xml
         _this.setEncoded(downloadLink, 'diagram.bpmn', err ? null : xml)
       })
     })
 
     this.createNewDiagram(this.bpmnModeler)
+
+    // 公开方法，以备给父iframe使用
+    window.getXmlJson = this.getXmlJson
   }
 }
 </script>
@@ -153,7 +162,7 @@ export default {
     top: 0;
     width: 300px;
   }
-  .buttons{
+  .buttons{ display: none;
     position: absolute;
     left: 20px;
     bottom: 20px;
