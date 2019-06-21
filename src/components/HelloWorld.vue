@@ -1,40 +1,3 @@
-# vue-bpmn-demo
-
-> vue-bpmn
-
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
-
----
-## 2.新建空的图，功能要求：
-
-① 空的，能自己画；
-
-② 以SVG image格式、BPMN diagram格式下载在本地；
-
-## 参考链接：(其实就是理解它的思路，把jQuery转化成vue)
-
-https://github.com/bpmn-io/bpmn-js-examples/blob/master/properties-panel/app/index.html
-
-https://github.com/bpmn-io/bpmn-js-examples/blob/master/properties-panel/app/index.js
-
-html:
-```html
 <template>
   <div class="containers" ref="content">
     <div class="canvas" ref="canvas"></div>
@@ -50,17 +13,15 @@ html:
     </ul>
   </div>
 </template>
-```
 
-js:
-```
 <script>
 // 引入相关的依赖
 // import BpmnViewer from 'bpmn-js'
 import BpmnModeler from 'bpmn-js/lib/Modeler'
 import propertiesPanelModule from 'bpmn-js-properties-panel'
 import propertiesProviderModule from 'bpmn-js-properties-panel/lib/provider/camunda'
-import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda'
+// import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda'
+import camundaModdleDescriptor from './camunda'
 
 export default {
   data () {
@@ -75,19 +36,18 @@ export default {
   },
   methods: {
     createNewDiagram () {
-      const bpmnXmlStr = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-        '<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn">\n' +
-        '  <bpmn2:process id="Process_1" isExecutable="false">\n' +
-        '    <bpmn2:startEvent id="StartEvent_1"/>\n' +
-        '  </bpmn2:process>\n' +
-        '  <bpmndi:BPMNDiagram id="BPMNDiagram_1">\n' +
-        '    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">\n' +
-        '      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">\n' +
-        '        <dc:Bounds height="36.0" width="36.0" x="412.0" y="240.0"/>\n' +
-        '      </bpmndi:BPMNShape>\n' +
-        '    </bpmndi:BPMNPlane>\n' +
-        '  </bpmndi:BPMNDiagram>\n' +
-        '</bpmn2:definitions>'
+      let processId = '' + new Date().getTime()
+      const bpmnXmlStr = `<?xml version="1.0" encoding="UTF-8"?>
+              <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="http://bpmn.io/schema/bpmn">
+                <process id="Process_id_${processId}" name="流程测试AA" isExecutable="true">
+                  <extensionElements>
+                    <flowable:executionListener event="start" />
+                  </extensionElements>
+                </process>
+                <bpmndi:BPMNDiagram id="BPMNDiagram_Process_id_${processId}">
+                  <bpmndi:BPMNPlane id="BPMNPlane_Process_id_${processId}" bpmnElement="Process_id_${processId}" />
+                </bpmndi:BPMNDiagram>
+              </definitions>`
       // 将字符串转换成图显示出来
       this.bpmnModeler.importXML(bpmnXmlStr, function (err) {
         if (err) {
@@ -111,9 +71,11 @@ export default {
     setEncoded (link, name, data) {
       // 把xml转换为URI，下载要用到的
       const encodedData = encodeURIComponent(data)
+
       // 获取到图的xml，保存就是把这个xml提交给后台
       this.xmlStr = data
       // 下载图的具体操作,改变a的属性，className令a标签可点击，href令能下载，download是下载的文件的名字
+
       if (data) {
         link.className = 'active'
         link.href = 'data:application/bpmn20-xml;charset=UTF-8,' + encodedData
@@ -157,6 +119,7 @@ export default {
       })
 
       _this.saveDiagram(function (err, xml) {
+        console.log('最新xml数据为：',xml)
         _this.setEncoded(downloadLink, 'diagram.bpmn', err ? null : xml)
       })
     })
@@ -165,9 +128,7 @@ export default {
   }
 }
 </script>
-```
-css:
-```css
+
 <style lang="scss">
   /*左边工具栏以及编辑节点的样式*/
   @import 'bpmn-js/dist/assets/diagram-js.css';
@@ -213,15 +174,3 @@ css:
     }
   }
 </style>
-```
-1.一打开页面（图片显示不全可参考详细描述）
-
-![](https://upload-images.jianshu.io/upload_images/7016617-103288648736ff80.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-2.修改之后下载按钮亮起（图片显示不全可参考详细描述）
-
-![](https://upload-images.jianshu.io/upload_images/7016617-74d2a5f8f1f262bd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-
-### 详细描述
-https://www.jianshu.com/p/bdc990db5159
